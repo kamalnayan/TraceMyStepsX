@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    
+  <style>
+    html, body{width:100%;height:100%;}
+      #clearkey
+      {
+      float:right;
+      margin-top:-0.4em;
+      }
+      #clearkey img
+      {
+          float: right;
+          height: 1em;
+          width: 1em;
+          margin-top:0em;
+      
+      }
+    </style>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
+<link rel="stylesheet" href="css/index.css" />
+<link rel="stylesheet" media="all and (orientation:portrait)" href="css/index.css">
+<link rel="stylesheet" media="all and (orientation:landscape)" href="css/index1.css">
+
+<script src="js/jquery.min.js">
+</script>
+
+
+
+
+<script>
+var currentaddress='';
+$(document).ready(function(){
+    $("#getlist").click(function(){
+    if(window.localStorage.length==0)
+    {
+    alert("Oops! You don't have any active tag.");
+    }
+    else{
+    $("#setting").hide(350);
+    $("ul").empty();
+     for (i=0; i< window.localStorage.length; i++){
+     var keyName = window.localStorage.key(i);
+     var value = window.localStorage.getItem(keyName);
+    
+     var temp=new Array();
+     temp=value.split('#');
+     var lis="li"+i;
+     var w=temp[11];
+     var res=temp[1];
+     currentaddress=temp[10];
+     $("<li>",{ html:'<div id="descr" onclick="getdetail('+i+');return false;">'+temp[0]+'</div><div id="ha">'+temp[2]+'</div><div id="add">'+temp[10]+' '+res+'<span id=span'+i+' class="hidespan">'+temp[10]+'</span><span id=sp'+i+' class="hidespan">'+temp[11]+'</span></div><div id="tagon">'+temp[7]+''+temp[8]+'<a href="javascript:deletetag('+i+');" id="clearkey"><img src="img/delete1.png"></a></div>'})
+        .prependTo("#finallist"); 
+     
+    }
+    $("#listitems").slideToggle(350);
+    $("#map_canvas").slideToggle(350);
+    
+    $("#options").slideToggle(350);
+    }
+    
+  });
+  
+    $("#back1").click(function(){
+    var scrn1=screen.width;
+     $("#map_canvas").slideToggle(300);
+     if(scrn1<=800)
+     {
+     $("#map_canvas").animate({height:'94%',opacity: 1
+  }, 300 );
+  }
+  else if(scrn1>800 && scrn1<=1280)
+  {
+  $("#map_canvas").animate({height:'92%',opacity: 1
+  }, 300 );
+  }
+    $("#options").slideToggle(300);
+    $("#listitems").slideToggle(300);
+   
+  });
+  $(document).on('click', '#descr', function(event) {
+     event.preventDefault();
+     var url = "taginfo.html?first=" + encodeURIComponent($("#pos").val()) + "&last=" + encodeURIComponent($("#to").val())+ "&lat1=" + encodeURIComponent($("#lat").val())+ "&lon1=" + encodeURIComponent($("#lon").val());
+     window.location.href = url;
+  });
+  $(".setting").click(function(){
+  var scrn2=screen.width;
+  if(scrn2<=800)
+  {
+  if ( $("#setting").is(":hidden") ) { 
+  $("#setting").slideToggle(350);
+   $("#map_canvas").animate({height:'60%',opacity: 1
+  }, 350 );
+  
+  } else if ( $("#setting").is(":visible") ) { 
+   $("#map_canvas").animate({height:'94%',opacity: 1
+  }, 350 );
+  $("#setting").animate({height:'0%',opacity: 1
+  }, 350 );
+  $("#setting").hide(350);
+  }
+  }
+  if(scrn2>800 && scrn2<=1280)
+  {
+  if ( $("#setting").is(":hidden") ) { 
+  $("#setting").slideToggle(350);
+   $("#map_canvas").animate({height:'60%',opacity: 1
+  }, 350 );
+  
+  } else if ( $("#setting").is(":visible") ) { 
+   $("#map_canvas").animate({height:'92%',opacity: 1
+  }, 350 );
+  $("#setting").animate({height:'0%',opacity: 1
+  }, 350 );
+  $("#setting").hide(350);
+  }
+  }
+  
+  }); 
+  $("#map_canvas").click(function(){
+  var scrn3=screen.width;
+  if(scrn3<=800)
+  {
+  $("#setting").hide(350);
+  $("#map_canvas").animate({height:'94%',opacity: 1
+  }, 350 );
+  }
+   if(scrn3>800 && scrn3<=1280)
+   {
+   $("#setting").hide(350);
+  $("#map_canvas").animate({height:'92%',opacity: 1
+  }, 350 );
+  }
+  });
+
+});
+</script>
+<script>
+function getdetail(t)
+{
+var te= $('#span'+t).html();
+$("#to").val(te);
+}
+function deletetag(c)
+{
+var r=confirm("Are you sure to delete this tag ?");
+var e=window.localStorage.length;
+
+if (r==true)
+  {
+  if(window.localStorage.length==1)
+  {
+  window.localStorage.clear();
+        window.location.reload()
+  }
+  else
+  {
+  var t= $('#sp'+c).html();
+  window.localStorage.removeItem(t);
+  window.location.reload()
+  }
+  }
+
+}
+function toggleinfo() {
+    var ab=document.getElementById('desc').value;
+    if(ab=="")
+    {
+    alert("Please enter tag info.");
+    }
+    else{
+    
+	var str1="key";
+    var str2=window.localStorage.length;
+    var key=str1.concat(str2);
+    var val1="<img src='img/tag2.png'>#  #";
+    var val2=document.getElementById('desc').value;
+    var val3="# Latitude: #";
+    var val4=document.getElementById('lat').value;
+    var val5="#, Longitude: #";
+    var val6=document.getElementById('lon').value;
+    var val7="# <b>Tagged On</b> #";
+    var currentdate = new Date();
+    var val8 =  currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/" 
+                + currentdate.getFullYear() + " @ "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
+    var val9="#img/tag2.png#"; 
+   
+    var val10=document.getElementById('pos').value;
+    var val11="#"+key;
+    var value=val1.concat(val2,val3,val4,val5,val6,val7,val8,val9,val10,val11);
+	window.localStorage.setItem(key,value); 
+    location.reload();
+    }
+   
+} 
+ function clearStorage(){
+        var cnf=confirm("Are you sure to clear all tags ?");
+        if(cnf==true)
+        {
+        window.localStorage.clear();
+        window.location.reload();
+        }
+        
+    }
+  function version()
+  {
+  alert("Version 1.0.0");
+  }
+    function aboutus()
+  {
+  window.location.href="http://www.abs-us.com/aboutus.html";
+  }
+</script>
+
+
+<script type="text/javascript">
+ var keyName ;
+    var image;
+    var im = 'img/hom.png';
+    var directionsDisplay;
+    var directionsService = new google.maps.DirectionsService();
+var map;
+    
+  var  geocoder = new google.maps.Geocoder();
+ var infowindow = new google.maps.InfoWindow();
+  var latlang;
+function codeLanLat1()
+{
+var status = navigator.onLine;
+if (status) {
+var mapOptions = {
+    zoom: 3,
+     panControl: false,
+    zoomControl: false,
+    center: new google.maps.LatLng(12.9667, 77.5667)
+  };
+  map = new google.maps.Map(document.getElementById('map_canvas'),
+      mapOptions);
+navigator.geolocation.getCurrentPosition(initialize,fail);
+    function initialize(position) {	
+    
+     
+    
+        latlang = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      var myOptions = {
+      center: latlang,
+      zoom: 18,
+      panControl: false,
+    zoomControl: false,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+ 
+    };
+    map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+    
+    
+    
+    
+    
+    var homeControlDiv = document.createElement('div');
+  var homeControl = new HomeControl(homeControlDiv, map);
+
+  homeControlDiv.index = 1;
+  map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(homeControlDiv);
+  var geocoder = new google.maps.Geocoder();   
+     
+ geocoder.geocode({ 'latLng': latlang }, function (items, status) {
+
+                    if (status == google.maps.GeocoderStatus.OK) {
+ 
+                        map.setZoom(18);
+                       document.getElementById('lat').value=position.coords.latitude;
+                       document.getElementById('lon').value=position.coords.longitude;
+                       var marker = new google.maps.Marker({
+                            position: latlang ,
+                            map: map,
+                            icon:im,
+                        });
+                          
+                          infowindow = new google.maps.InfoWindow({
+                         content: '<div><div id="tinfo"><img src="img/tag1.png">You are here</div><div id="tinfo1">'+items[1].formatted_address+'</div><div class="buttons2" ><input type="text" id="desc" maxlength="30"/><a class="tag" href="javascript:toggleinfo();"><img src="img/tick.png" title="Select Info" /></a></div></div>'
+         
+        
+  });
+                     
+					  document.getElementById('pos').value=items[0].formatted_address;
+                      google.maps.event.addListener(marker, 'click', function () {
+                      infowindow.open(map, this);
+                      map.setZoom(18);
+            });
+            
+                        for (i=0; i< window.localStorage.length; i++){
+         keyName = window.localStorage.key(i);
+         var value = window.localStorage.getItem(keyName);
+         var temp1=new Array();
+         temp1=value.split('#');
+         var image1=temp1[9];
+         var information=temp1[2];
+          $("<li>",{ html:'</span><span id=spa'+i+' class="hidespan"><b>'+temp1[2]+'</b><div>'+temp1[10]+'</div><div>Tagged on- '+temp1[8]+'</div></span>'}).appendTo("#hiddenul"); 
+                        var inf= $('#spa'+i).html();
+                        var a=temp1[4];
+                        var b=temp1[6];
+						var marker;
+                        var myLatLng1 = new google.maps.LatLng(a, b);
+                        marker = new google.maps.Marker({
+                            position: myLatLng1 ,
+                            map: map,
+                            icon:image1,
+                        });
+                        attachSecretMessage(marker, i);
+                        
+                      
+                        }
+                    }
+                    else{
+                    alert("Sorry,cannot find your location. Switch on your GPS");
+                    }
+                    function attachSecretMessage(marker, num) {
+                    var inf1= $('#spa'+i).html();
+                    var infowindow = new google.maps.InfoWindow({
+                    content:inf1
+  });
+
+  google.maps.event.addListener(marker, 'click', function() {
+    infowindow.open(marker.get('map'), marker);
+  });
+}
+ 
+                });
+                
+}
+ function fail(){
+         alert('Sorry,can not find any network connection');
+}
+} else {
+alert('Sorry,can not find any network connection');
+var mapOptions = {
+    zoom: 3,
+     panControl: false,
+    zoomControl: false,
+    center: new google.maps.LatLng(12.9667, 77.5667)
+  };
+}
+}
+ 
+ function HomeControl(controlDiv, map) {
+
+  // Set CSS styles for the DIV containing the control
+  // Setting padding to 5 px will offset the control
+  // from the edge of the map
+  controlDiv.style.padding = '5px';
+
+  // Set CSS for the control border
+  var controlUI = document.createElement('div');
+  controlUI.style.backgroundColor = 'white';
+  controlUI.style.borderStyle = 'solid';
+  controlUI.style.borderWidth = '2px';
+  controlUI.style.cursor = 'pointer';
+  controlUI.style.textAlign = 'center';
+  controlUI.title = 'Click to set the map to Home';
+  controlDiv.appendChild(controlUI);
+
+  // Set CSS for the control interior
+  var controlText = document.createElement('div');
+  controlText.style.padding = '5px';
+  controlText.innerHTML = '<img src="img/hom.png"/>';
+  controlUI.appendChild(controlText);
+
+  // Setup the click event listeners: simply set the map to
+  // Chicago
+  google.maps.event.addDomListener(controlUI, 'click', function() {
+    map.setCenter(latlang)
+  });
+
+}
+ 
+
+window.onload=codeLanLat1;
+ 
+</script>
+
+
+</head>
+<body>
+
+<div id="map_canvas"></div>
+<center>
+<div class="buttons1" id="options">
+   
+			<a class="tag" id="getlist" href="#"><img src="img/list.png" title="Find the taged locations" /></a>
+			<a class="setting" href="#;"><img src="img/setting.png" title="Setting" /></a>
+			<input type="hidden" id="lat"><input type="hidden" id="lon">
+			
+			<!--<a class="rss" href=""><img src="img/rss.png" /></a>-->
+			
+		</div></center>
+		 <div id="setting" style="display: none">
+		 <p><a class="a1" href="javascript:aboutus();">About us</a></p>
+         <div id="set1"><a class="a1" href="javascript:version();">Version</a></div>
+   </div>
+		<div id="listitems" style="display: none"> 
+		
+		<div id="showlist">
+		<br>
+		
+		
+		<h1>My Tags</h1>
+		<div id="taglist">
+		
+		<ul align="left" id="finallist">
+          
+        </ul></div>
+        </div>
+       <center>
+<div class="buttons1" id="options">
+			<a class="tag" href="#" id="back1"><img src="img/back2.png" title="Go Back" /></a>
+			<a class="tag" href="javascript:clearStorage();"><img src="img/cancel_32.png" title="Clear" /></a>
+		</div>	</center>	
+		
+		
+   </div>
+		
+<input type="hidden" id="pos"><input type="hidden" value="chennai,india" id="to">
+             <div id="checkit"></div>  
+             <ul id="hiddenul" style="display: none">
+             <li>hi</li></ul>  
+</body>
+</html>
